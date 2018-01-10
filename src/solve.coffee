@@ -139,6 +139,17 @@ permutationIndex = (context, start, end, fromEnd=false) ->
         while our[j] isnt start + j
           rotateLeft(our, 0, j)
           k++
+
+
+
+          # First major break
+          if k > 100000
+            return -1
+
+
+
+
+
         b = (j + 1) * b + k
 
       a * maxB + b
@@ -501,14 +512,93 @@ Cube::solve = (maxDepth=22) ->
       @twist = cube.twist()
       @slice = cube.FRtoBR() / N_SLICE2 | 0
 
+
+
+
+
+
+
+      if @slice is -1
+        return false
+
+
+
+
+
+
       # Phase 2 coordinates
       @parity = cube.cornerParity()
       @URFtoDLF = cube.URFtoDLF()
+
+
+
+
+
+
+
+      if @URFtoDLF is -1
+        return false
+
+
+
+
+
+
       @FRtoBR = cube.FRtoBR()
+
+
+
+
+
+
+      if @FRtoBR is -1
+        return false
+
+
+
+
+
+
+
+
 
       # These are later merged to URtoDF when phase 2 begins
       @URtoUL = cube.URtoUL()
+
+
+
+
+
+
+
+
+
+
+
+      if @URtoUL is -1
+        return false
+
+
+
+
+
+
+
+
+
+
       @UBtoDF = cube.UBtoDF()
+
+
+
+
+
+      if @UBtoDF is -1
+        return false
+
+
+
+
 
       this
 
@@ -616,19 +706,11 @@ Cube::solve = (maxDepth=22) ->
   phase1search = (state, t0) ->
     depth = 0
     for depth in [1..maxDepth]
-      if performance.now() / 1000 - t0 > allowedTime
-        solution = 'invalid'
-      if solution is 'invalid'
-        break
       phase1(state, depth, t0)
       break if solution isnt null
       depth++
 
   phase1 = (state, depth, t0) ->
-    if performance.now() / 1000 - t0 > allowedTime
-      solution = 'invalid'
-    if solution is 'invalid'
-      return
     if depth is 0
       if state.minDist1() is 0
         # Make sure we don't start phase 2 with a phase 2 move as the
@@ -646,10 +728,6 @@ Cube::solve = (maxDepth=22) ->
           break if solution isnt null
 
   phase2search = (state, t0) ->
-    if performance.now() / 1000 - t0 > allowedTime
-      solution = 'invalid'
-    if solution is 'invalid'
-      return
     # Initialize phase 2 coordinates
     state.init2()
 
@@ -659,10 +737,6 @@ Cube::solve = (maxDepth=22) ->
       depth++
 
   phase2 = (state, depth) ->
-    if performance.now() / 1000 - t0 > allowedTime
-      solution = 'invalid'
-    if solution is 'invalid'
-      return
     if depth is 0
       if state.minDist2() is 0
         solution = state.solution()
@@ -676,6 +750,24 @@ Cube::solve = (maxDepth=22) ->
 
   freeStates = (new State for x in [0..maxDepth + 1])
   state = freeStates.pop().init(this)
+
+
+
+
+
+
+  if state is false
+    solution = 'invalid '
+    return solution
+
+
+
+
+
+
+
+
+
   phase1search(state, t0)
   freeStates.push(state)
 
