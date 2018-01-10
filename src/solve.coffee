@@ -611,6 +611,8 @@ Cube::solve = (maxDepth=22) ->
     ## Helpers
 
     move: (table, index, move) ->
+      if index is -1
+        return false
       Cube.moveTables[table][index][move]
 
     pruning: (table, index) ->
@@ -668,22 +670,33 @@ Cube::solve = (maxDepth=22) ->
     init2: (top=true) ->
       if @parent is null
         # Already assigned for the initial state
-        return
+        return true
 
       # For other states, the phase 2 state is computed based on
       # parent's state.
       @parent.init2(false)
 
       @URFtoDLF = @move('URFtoDLF', @parent.URFtoDLF, @lastMove)
+      if @URFtoDLF is false
+        return false
       @FRtoBR = @move('FRtoBR', @parent.FRtoBR, @lastMove)
+      if @FRtoBR is false
+        return false
       @parity = @move('parity', @parent.parity, @lastMove)
+      if @parity is false
+        return false
       @URtoUL = @move('URtoUL', @parent.URtoUL, @lastMove)
+      if @URtoUL is false
+        return false
       @UBtoDF = @move('UBtoDF', @parent.UBtoDF, @lastMove)
+      if @UBtoDF is false
+        return false
 
       if top
         # This is the initial phase 2 state. Get the URtoDF coordinate
         # by merging URtoUL and UBtoDF
         @URtoDF = @move('mergeURtoDF', @URtoUL, @UBtoDF)
+      return true
 
     # Compute the next phase 2 state for the given move
     next2: (move) ->
@@ -698,8 +711,6 @@ Cube::solve = (maxDepth=22) ->
       next.URtoDF = @move('URtoDF', @URtoDF, move)
 
       next
-  t0 = performance.now() / 1000
-  allowedTime = 1
 
   solution = null
 
@@ -729,7 +740,10 @@ Cube::solve = (maxDepth=22) ->
 
   phase2search = (state, t0) ->
     # Initialize phase 2 coordinates
-    state.init2()
+    m = state.init2()
+    if m is false
+      solution = 'invalid '
+      return
 
     for depth in [1..maxDepth - state.depth]
       phase2(state, depth, t0)
