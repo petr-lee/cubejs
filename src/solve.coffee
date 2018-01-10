@@ -696,6 +696,8 @@ Cube::solve = (maxDepth=22) ->
         # This is the initial phase 2 state. Get the URtoDF coordinate
         # by merging URtoUL and UBtoDF
         @URtoDF = @move('mergeURtoDF', @URtoUL, @UBtoDF)
+        if @URtoDF is false
+          return false
       return true
 
     # Compute the next phase 2 state for the given move
@@ -714,21 +716,21 @@ Cube::solve = (maxDepth=22) ->
 
   solution = null
 
-  phase1search = (state, t0) ->
+  phase1search = (state) ->
     depth = 0
     for depth in [1..maxDepth]
-      phase1(state, depth, t0)
+      phase1(state, depth)
       break if solution isnt null
       depth++
 
-  phase1 = (state, depth, t0) ->
+  phase1 = (state, depth) ->
     if depth is 0
       if state.minDist1() is 0
         # Make sure we don't start phase 2 with a phase 2 move as the
         # last move in phase 1, because phase 2 would then repeat the
         # same move.
         if state.lastMove is null or state.lastMove not in allMoves2
-          phase2search(state, t0)
+          phase2search(state)
 
     else if depth > 0
       if state.minDist1() <= depth
@@ -738,7 +740,7 @@ Cube::solve = (maxDepth=22) ->
           freeStates.push(next)
           break if solution isnt null
 
-  phase2search = (state, t0) ->
+  phase2search = (state) ->
     # Initialize phase 2 coordinates
     m = state.init2()
     if m is false
@@ -746,7 +748,7 @@ Cube::solve = (maxDepth=22) ->
       return
 
     for depth in [1..maxDepth - state.depth]
-      phase2(state, depth, t0)
+      phase2(state, depth)
       break if solution isnt null
       depth++
 
@@ -782,7 +784,7 @@ Cube::solve = (maxDepth=22) ->
 
 
 
-  phase1search(state, t0)
+  phase1search(state)
   freeStates.push(state)
 
   # Trim the trailing space
