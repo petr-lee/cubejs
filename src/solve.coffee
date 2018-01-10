@@ -625,7 +625,6 @@ Cube::solve = (maxDepth=22) ->
       depth++
 
   phase1 = (state, depth, t0) ->
-    console.log(performance.now() / 1000 - t0)
     if performance.now() / 1000 - t0 > allowedTime
       solution = 'invalid'
     if solution is 'invalid'
@@ -647,7 +646,6 @@ Cube::solve = (maxDepth=22) ->
           break if solution isnt null
 
   phase2search = (state, t0) ->
-    console.log(performance.now() / 1000 - t0)
     if performance.now() / 1000 - t0 > allowedTime
       solution = 'invalid'
     if solution is 'invalid'
@@ -661,7 +659,6 @@ Cube::solve = (maxDepth=22) ->
       depth++
 
   phase2 = (state, depth) ->
-    console.log(performance.now() / 1000 - t0)
     if performance.now() / 1000 - t0 > allowedTime
       solution = 'invalid'
     if solution is 'invalid'
