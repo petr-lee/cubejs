@@ -609,12 +609,11 @@ Cube::solve = (maxDepth=22) ->
 
       next
   t0 = performance.now() / 1000
-  allowedTime = 4
+  allowedTime = 1
 
   solution = null
 
   phase1search = (state, t0) ->
-    console.log(performance.now() / 1000 - t0)
     depth = 0
     for depth in [1..maxDepth]
       if performance.now() / 1000 - t0 > allowedTime
