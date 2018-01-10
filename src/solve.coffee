@@ -608,27 +608,34 @@ Cube::solve = (maxDepth=22) ->
       next.URtoDF = @move('URtoDF', @URtoDF, move)
 
       next
-
+  t0 = performance.now() / 1000
+  allowedTime = 0.000001
 
   solution = null
 
-  phase1search = (state) ->
-    console.log('phase1search')
+  phase1search = (state, t0) ->
     depth = 0
     for depth in [1..maxDepth]
-      phase1(state, depth)
+      if performance.now() / 1000 - t0 > allowedTime
+        solution = 'invalid'
+      if solution is 'invalid'
+        break
+      phase1(state, depth, t0)
       break if solution isnt null
       depth++
 
-  phase1 = (state, depth) ->
-    console.log('phase1')
+  phase1 = (state, depth, t0) ->
+    if performance.now() / 1000 - t0 > allowedTime
+      solution = 'invalid'
+    if solution is 'invalid'
+      return
     if depth is 0
       if state.minDist1() is 0
         # Make sure we don't start phase 2 with a phase 2 move as the
         # last move in phase 1, because phase 2 would then repeat the
         # same move.
         if state.lastMove is null or state.lastMove not in allMoves2
-          phase2search(state)
+          phase2search(state, t0)
 
     else if depth > 0
       if state.minDist1() <= depth
@@ -638,18 +645,24 @@ Cube::solve = (maxDepth=22) ->
           freeStates.push(next)
           break if solution isnt null
 
-  phase2search = (state) ->
-    console.log('phase2search')
+  phase2search = (state, t0) ->
+    if performance.now() / 1000 - t0 > allowedTime
+      solution = 'invalid'
+    if solution is 'invalid'
+      return
     # Initialize phase 2 coordinates
     state.init2()
 
     for depth in [1..maxDepth - state.depth]
-      phase2(state, depth)
+      phase2(state, depth, t0)
       break if solution isnt null
       depth++
 
   phase2 = (state, depth) ->
-    console.log('phase2')
+    if performance.now() / 1000 - t0 > allowedTime
+      solution = 'invalid'
+    if solution is 'invalid'
+      return
     if depth is 0
       if state.minDist2() is 0
         solution = state.solution()
@@ -663,7 +676,7 @@ Cube::solve = (maxDepth=22) ->
 
   freeStates = (new State for x in [0..maxDepth + 1])
   state = freeStates.pop().init(this)
-  phase1search(state)
+  phase1search(state, t0)
   freeStates.push(state)
 
   # Trim the trailing space
