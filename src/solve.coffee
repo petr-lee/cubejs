@@ -609,7 +609,7 @@ Cube::solve = (maxDepth=22) ->
 
       next
   t0 = performance.now() / 1000
-  allowedTime = 0.001
+  allowedTime = 4
 
   solution = null
 
