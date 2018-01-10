@@ -613,6 +613,7 @@ Cube::solve = (maxDepth=22) ->
   solution = null
 
   phase1search = (state) ->
+    console.log('phase1search')
     depth = 0
     for depth in [1..maxDepth]
       phase1(state, depth)
@@ -620,6 +621,7 @@ Cube::solve = (maxDepth=22) ->
       depth++
 
   phase1 = (state, depth) ->
+    console.log('phase1')
     if depth is 0
       if state.minDist1() is 0
         # Make sure we don't start phase 2 with a phase 2 move as the
@@ -637,6 +639,7 @@ Cube::solve = (maxDepth=22) ->
           break if solution isnt null
 
   phase2search = (state) ->
+    console.log('phase2search')
     # Initialize phase 2 coordinates
     state.init2()
 
@@ -646,6 +649,7 @@ Cube::solve = (maxDepth=22) ->
       depth++
 
   phase2 = (state, depth) ->
+    console.log('phase2')
     if depth is 0
       if state.minDist2() is 0
         solution = state.solution()
